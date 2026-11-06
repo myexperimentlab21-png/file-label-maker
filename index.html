@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<!--
+  =====================================================================
+  FILE LABEL MAKER  -  index.html  (the STRUCTURE of the page)
+  =====================================================================
+  This project has 3 files. Keep them in the SAME folder:
+
+    index.html  -> what is on the page (this file)
+    style.css   -> how it looks (colours, sizes, layout)
+    script.js   -> how it behaves (typing, buttons, PDF)
+
+  To use it: double-click index.html. An internet connection is needed
+  the first time (the font and the PDF library load from the internet).
+  =====================================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>File label maker</title>
+
+  <!-- Heavy "Archivo" font used on the labels -->
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <!-- Our own styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Two libraries that make the PDF:
+       html2canvas = takes a "photo" of the sheet
+       jsPDF       = puts that photo on an A4 page and saves it -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ============ PAGE TITLE ============ -->
+  <header>
+    <h1>File label maker</h1>
+    <p>Spine labels at 4.5 × 18.7 cm, up to five per A4 landscape sheet.</p>
+  </header>
+
+  <main>
+
+    <!-- ============ 1. THE FORM ============
+         Every input has data-field="..." . That name must match a key
+         of the "form" object in script.js, so one piece of JavaScript
+         can handle all of them. -->
+    <section class="card" aria-label="Label details">
+      <h2>Label details</h2>
+
+      <!-- Optional: upload your own logo picture -->
+      <div class="button-row">
+        <label class="field no-margin">Logo image (optional)
+          <input id="logoInput" type="file" accept="image/*">
+        </label>
+        <button id="resetLogoBtn" type="button">Use default logo</button>
+      </div>
+      <p class="hint">A new logo applies to new labels only. Labels already on the sheet never change.</p>
+
+      <!-- Year and volume side by side -->
+      <div class="grid-2">
+        <label class="field">Year
+          <input data-field="year" type="text" inputmode="numeric">
+        </label>
+        <label class="field">Volume number
+          <input data-field="volume" type="text" placeholder="01">
+        </label>
+      </div>
+
+      <label class="field">Document code or number
+        <input data-field="code" type="text" placeholder="5040">
+      </label>
+      <!-- These colours are set in CODE_COLORS in script.js -->
+      <p class="hint">Bottom bar colour: 5040 red, 5046 green, 5047 purple. Any other code: dark red.</p>
+
+      <!-- Document type: preset colours, or your own -->
+      <div class="divider">
+        <label class="field">Document type preset
+          <select data-field="preset">
+            <optgroup label="Receivable (sales and money in)">
+              <option value="Tax Invoice">Tax Invoice</option>
+              <option value="Invoice">Invoice</option>
+              <option value="Commercial Invoice">Commercial Invoice</option>
+              <option value="Cash Receipt Voucher">Cash Receipt Voucher</option>
+              <option value="Bank Receipt Voucher">Bank Receipt Voucher</option>
+              <option value="Sales Return Tax Credit Note">Sales Return Tax Credit Note</option>
+              <option value="FT Tax Credit Note">FT Tax Credit Note</option>
+              <option value="FT Commercial Credit Note">FT Commercial Credit Note</option>
+            </optgroup>
+            <optgroup label="Payable (purchase and money out)">
+              <option value="Bank Payment Voucher">Bank Payment Voucher</option>
+              <option value="Post-Dated Cheque Voucher (AP PDC)">Post-Dated Cheque Voucher (AP PDC)</option>
+              <option value="Vendor Invoice">Vendor Invoice</option>
+              <option value="Debit Note">Debit Note</option>
+              <option value="AP Tax Debit Note">AP Tax Debit Note</option>
+              <option value="FT Commercial Debit Note">FT Commercial Debit Note</option>
+              <option value="Purchase Order">Purchase Order</option>
+              <option value="Goods Received Note">Goods Received Note</option>
+            </optgroup>
+            <optgroup label="Neutral">
+              <option value="General Journal Voucher">General Journal Voucher</option>
+            </optgroup>
+            <optgroup label="Other">
+              <option value="custom">Custom colours</option>
+            </optgroup>
+          </select>
+        </label>
+
+        <label class="field">Document type / title
+          <input data-field="title" type="text">
+        </label>
+
+        <div class="grid-2">
+          <label class="field">Banner colour
+            <input data-field="bgColor" type="color">
+          </label>
+          <label class="field">Banner text colour
+            <input data-field="textColor" type="color">
+          </label>
+        </div>
+      </div>
+
+      <!-- Serial number range -->
+      <div class="grid-2">
+        <label class="field">Range from
+          <input data-field="from" type="text" placeholder="Start serial">
+        </label>
+        <label class="field">Range to
+          <input data-field="to" type="text" placeholder="End serial">
+        </label>
+      </div>
+      <p class="hint">Leave the range blank to write it by hand after printing.</p>
+    </section>
+
+
+    <!-- ============ 2. LIVE PREVIEW ============
+         script.js draws one label inside <div id="preview"> -->
+    <section class="card" aria-label="Live preview">
+      <h2>Live preview</h2>
+      <p class="hint">Shown at actual size.</p>
+
+      <div class="preview-box">
+        <div id="preview"></div>
+
+        <!-- Small preview of the tracking sheet (hidden when the box is unticked) -->
+        <div id="trackThumbWrap">
+          <p class="hint">Tracking sheet for this label</p>
+          <div class="track-thumb"><div id="trackPreview"></div></div>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="addBtn" class="primary" type="button">Add label to sheet</button>
+        <label class="inline-label">
+          <input id="autoBump" type="checkbox" checked>
+          Raise the volume number by 1 after adding
+        </label>
+      </div>
+    </section>
+
+
+    <!-- ============ 3. PRINT SHEET ============ -->
+    <section class="card sheet-card" aria-label="Print sheet">
+
+      <!-- Title + buttons -->
+      <div class="sheet-toolbar">
+        <h2>Print sheet <span id="count"></span></h2>
+        <button id="clearBtn" type="button">Clear sheet</button>
+        <button id="pdfBtn" class="primary" type="button">Download PDF</button>
+      </div>
+
+      <!-- Options for the tracking sheets -->
+      <div class="button-row">
+        <label class="inline-label">
+          <input id="trackCheck" type="checkbox" checked>
+          Add tracking sheets (one A4 page per label)
+        </label>
+        <label class="inline-label">
+          <input id="rangeCheck" type="checkbox">
+          Show the range (from / to numbers) on the tracking sheets
+        </label>
+      </div>
+
+      <!-- How many pages the PDF will have -->
+      <p id="pageInfo" class="hint"></p>
+
+      <!-- The A4 landscape paper. script.js puts the labels inside it. -->
+      <div id="sheetWrap" class="sheet-wrap">
+        <div id="sheet" class="paper"></div>
+      </div>
+
+      <!-- One small button per queued label, click to remove it -->
+      <div id="chips" class="chips"></div>
+
+      <!-- Messages such as "The sheet is full" -->
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+  </main>
+
+  <!-- Our JavaScript goes LAST so the page above already exists when it runs -->
+  <script src="script.js"></script>
+</body>
+</html>
