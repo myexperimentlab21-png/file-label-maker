@@ -181,10 +181,10 @@ function buildLabel(data) {
 
   // Header: your uploaded logo. With no logo we show a grey hint on screen
   // (the hint is hidden in the PDF, so an empty box is printed instead).
-  let headerHtml;
-  if (data.logo) {
-    headerHtml = '<img class="lbl-logo-img" src="' + data.logo + '" alt="">';
-  } else {
+   let headerHtml = '';
+   if (data.logo) {
+     headerHtml = '<img class="lbl-logo-img" src="' + data.logo + '" alt="">';
+   }} else {
     headerHtml = '<span class="lbl-logo-hint">Your logo</span>';
   }
 
