@@ -35,13 +35,6 @@ const STORAGE_KEY = 'fileLabelMaker3';
    2. DATA
    --------------------------------------------------------------------- */
 
-// The company shown in the label header. Change the texts or the colour here.
-const COMPANY = {
-  // name: 'Al Shula General Trading Co. L.L.C.',
-  // arabic: 'شركة الشعلة للتجارة العامة ش.ذ.م.م',
-  // color: '#d71920'                       // colour of the flame icon
-};
-
 // Document presets (colour scheme "Option A": one colour per document type).
 // Format:  'Name in the dropdown': [text on the banner, banner colour, text colour]
 // The banner shows a SHORT text: names of 14 letters or fewer are written in
@@ -96,7 +89,7 @@ let form = {
   textColor: '#000000',
   from: '',
   to: '',
-  logo: ''     // your uploaded logo picture (empty = default icon + name).
+  logo: ''     // your uploaded logo picture (empty = no logo yet).
                // It is copied together with the label, so a label on the
                // sheet keeps its own logo even if you upload another one later.
 };
@@ -186,20 +179,13 @@ function barColorFor(code) {
    --------------------------------------------------------------------- */
 function buildLabel(data) {
 
-  // Header: an uploaded logo if there is one, otherwise icon + names
+  // Header: your uploaded logo. With no logo we show a grey hint on screen
+  // (the hint is hidden in the PDF, so an empty box is printed instead).
   let headerHtml;
   if (data.logo) {
     headerHtml = '<img class="lbl-logo-img" src="' + data.logo + '" alt="">';
   } else {
-    headerHtml =
-      '<svg class="lbl-emblem" viewBox="0 0 40 40">' +
-        '<path d="M21 2c2 7 12 11 12 22a12 12 0 0 1-24 0c0-6 3-9 6-13 0 3 1 5 3 6 0-6-1-10 3-15z" fill="' + escapeHtml(COMPANY.color) + '"/>' +
-        '<path d="M21 24c2 3 5 5 5 9a5 5 0 0 1-10 0c0-4 3-6 5-9z" fill="#fff"/>' +
-      '</svg>' +
-      '<div class="lbl-names">' +
-        '<span class="lbl-arabic" dir="rtl">' + escapeHtml(COMPANY.arabic) + '</span>' +
-        '<span class="lbl-english">' + escapeHtml(COMPANY.name) + '</span>' +
-      '</div>';
+    headerHtml = '<span class="lbl-logo-hint">Your logo</span>';
   }
 
   // Text for the rows
@@ -454,7 +440,7 @@ function shrinkImage(dataUrl, maxWidth, done) {
   img.src = dataUrl;
 }
 
-// Go back to the default logo (for NEW labels only)
+// Remove the logo (for NEW labels only)
 function onResetLogo() {
   form.logo = '';
   getEl('logoInput').value = '';
@@ -533,6 +519,7 @@ function onChipClick(event) {
 async function takePhoto(html) {
   const hidden = document.createElement('div');
   hidden.style.cssText = 'position:absolute;left:-10000px;top:0';
+  hidden.className = 'print-copy';   // lets the CSS hide screen-only hints in the PDF
   hidden.innerHTML = html;
   document.body.appendChild(hidden);
   try {
