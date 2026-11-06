@@ -184,7 +184,7 @@ function buildLabel(data) {
    let headerHtml = '';
    if (data.logo) {
      headerHtml = '<img class="lbl-logo-img" src="' + data.logo + '" alt="">';
-   }} else {
+   }else {
     headerHtml = '<span class="lbl-logo-hint">Your logo</span>';
   }
 
