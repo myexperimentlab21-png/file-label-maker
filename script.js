@@ -37,9 +37,9 @@ const STORAGE_KEY = 'fileLabelMaker3';
 
 // The company shown in the label header. Change the texts or the colour here.
 const COMPANY = {
-  name: 'Al Shula General Trading Co. L.L.C.',
-  arabic: 'شركة الشعلة للتجارة العامة ش.ذ.م.م',
-  color: '#d71920'                       // colour of the flame icon
+  // name: 'Al Shula General Trading Co. L.L.C.',
+  // arabic: 'شركة الشعلة للتجارة العامة ش.ذ.م.م',
+  // color: '#d71920'                       // colour of the flame icon
 };
 
 // Document presets (colour scheme "Option A": one colour per document type).
